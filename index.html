@@ -293,6 +293,9 @@
     </div>
 
     <script>
+        // Global variables
+        let allPosts = [];
+
         function togglePost(header) {
             const post = header.parentElement;
             const content = post.querySelector('.collapsed-content');
@@ -307,8 +310,153 @@
             }
         }
 
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
+        // Parse date string into Date object for sorting
+        function parseDate(dateString) {
+            return new Date(dateString);
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Clean HTML content from Word documents
+        function cleanWordHTML(html) {
+            // Remove Word-specific tags and attributes
+            let cleaned = html
+                .replace(/<o:p\s*\/?>/gi, '')
+                .replace(/<\/o:p>/gi, '')
+                .replace(/<w:.*?>/gi, '')
+                .replace(/<\/w:.*?>/gi, '')
+                .replace(/class="MsoNormal"/gi, '')
+                .replace(/style="[^"]*"/gi, '')
+                .replace(/<span[^>]*>\s*<\/span>/gi, '')
+                .replace(/<p[^>]*>\s*<\/p>/gi, '')
+                .replace(/&nbsp;/gi, ' ');
+
+            // Extract just the body content if it exists
+            const bodyMatch = cleaned.match(/<body[^>]*>(.*?)<\/body>/is);
+            if (bodyMatch) {
+                cleaned = bodyMatch[1];
+            }
+
+            // Clean up extra whitespace and empty tags
+            cleaned = cleaned
+                .replace(/\s+/g, ' ')
+                .replace(/<([^>]+)>\s*<\/\1>/gi, '')
+                .trim();
+
+            return cleaned;
+        }
+
+        // Load post content from HTML file
+        async function loadPostContent(filename) {
+            try {
+                const response = await fetch(`posts/${filename}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${filename}`);
+                }
+                const html = await response.text();
+                return cleanWordHTML(html);
+            } catch (error) {
+                console.error('Error loading post content:', error);
+                return '<p>Error loading post content. Please check if the file exists in the posts folder.</p>';
+            }
+        }
+
+        // Display the latest post
+        async function displayLatestPost(post) {
+            const latestPostElement = document.getElementById('latest-post');
+            const content = await loadPostContent(post.filename);
+            
+            latestPostElement.innerHTML = `
+                <h2 class="post-title">${post.title}</h2>
+                <div class="post-date">${formatDate(post.date)}</div>
+                <div class="post-content">${content}</div>
+            `;
+        }
+
+        // Display older posts in collapsed format
+        async function displayOlderPosts(posts) {
+            const collapsedSection = document.querySelector('.collapsed-posts');
+            const postsContainer = collapsedSection.querySelector('.section-title').nextElementSibling;
+            
+            // Clear existing posts
+            while (postsContainer && postsContainer.classList.contains('collapsed-post')) {
+                postsContainer.remove();
+                postsContainer = collapsedSection.querySelector('.section-title').nextElementSibling;
+            }
+
+            // Add each older post
+            for (const post of posts) {
+                const content = await loadPostContent(post.filename);
+                
+                const postElement = document.createElement('div');
+                postElement.className = 'collapsed-post';
+                postElement.innerHTML = `
+                    <div class="collapsed-header" onclick="togglePost(this)">
+                        <div>
+                            <h4 class="collapsed-title">${post.title}</h4>
+                            <div class="collapsed-date">${formatDate(post.date)}</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsed-content">
+                        <div class="post-content">${content}</div>
+                    </div>
+                `;
+                
+                collapsedSection.appendChild(postElement);
+            }
+        }
+
+        // Load posts from posts.json
+        async function loadPosts() {
+            try {
+                const response = await fetch('posts.json');
+                if (!response.ok) {
+                    throw new Error('posts.json not found');
+                }
+                
+                const data = await response.json();
+                allPosts = data.posts || [];
+                
+                if (allPosts.length === 0) {
+                    showFallbackContent();
+                    return;
+                }
+
+                // Sort posts by date (newest first)
+                allPosts.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+                
+                // Display latest post
+                await displayLatestPost(allPosts[0]);
+                
+                // Display older posts if any exist
+                if (allPosts.length > 1) {
+                    const olderPosts = allPosts.slice(1);
+                    await displayOlderPosts(olderPosts);
+                } else {
+                    // Hide the older posts section if only one post exists
+                    document.querySelector('.collapsed-posts').style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                showFallbackContent();
+            }
+        }
+
+        // Show fallback content if posts.json doesn't exist
+        function showFallbackContent() {
+            console.log('Using fallback content - create posts.json to load your posts');
+            // The HTML already contains fallback content, so we don't need to do anything
+        }
+
+        // Add intersection observer for animations
+        function initializeAnimations() {
             const posts = document.querySelectorAll('.collapsed-post');
             
             const observerOptions = {
@@ -331,18 +479,29 @@
                 post.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
                 observer.observe(post);
             });
-        });
-
-        // Dynamic content loading simulation
-        // In a real implementation, this would fetch from your posts.json file
-        function loadLatestPost() {
-            // This function would typically fetch the latest post from your posts folder
-            // For now, it's just a placeholder for the structure
-            console.log('Loading latest post...');
         }
 
-        // Call on page load
-        loadLatestPost();
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPosts().then(() => {
+                // Re-initialize animations after posts are loaded
+                setTimeout(initializeAnimations, 100);
+            });
+        });
+
+        // Refresh posts (useful for development)
+        function refreshPosts() {
+            loadPosts();
+        }
+
+        // Search functionality (bonus feature)
+        function searchPosts(query) {
+            const filteredPosts = allPosts.filter(post => 
+                post.title.toLowerCase().includes(query.toLowerCase()) ||
+                post.excerpt?.toLowerCase().includes(query.toLowerCase())
+            );
+            return filteredPosts;
+        }
     </script>
 </body>
 </html>
