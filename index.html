@@ -1,1 +1,348 @@
-<p>hello</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>popculture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcf7f, #4ecdc4, #45b7d1);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 8s ease infinite;
+            text-transform: lowercase;
+            letter-spacing: -2px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .post-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .post-date {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .post-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .post-content p {
+            margin-bottom: 1.2rem;
+        }
+
+        .collapsed-posts {
+            margin-top: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .collapsed-post {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsed-post:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .collapsed-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapsed-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .collapsed-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .expand-icon {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsed-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .collapsed-content.expanded {
+            max-height: 1000px;
+        }
+
+        .collapsed-content .post-content {
+            padding: 2rem;
+            margin: 0;
+        }
+
+        .expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .post-card {
+                padding: 1.5rem;
+            }
+            
+            .post-title {
+                font-size: 1.8rem;
+            }
+            
+            .collapsed-header {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">popculture</h1>
+            <p class="tagline">where trends meet thoughts</p>
+        </header>
+
+        <main>
+            <!-- Latest Post -->
+            <article class="post-card pulse" id="latest-post">
+                <h2 class="post-title">The Rise of Digital Minimalism in 2025</h2>
+                <div class="post-date">March 15, 2025</div>
+                <div class="post-content">
+                    <p>In a world saturated with digital noise, a new movement is quietly taking hold. Digital minimalism isn't just about decluttering your apps—it's about reclaiming your mental space and intentional living in the digital age.</p>
+                    <p>From celebrities posting less to viral TikToks about phone-free dinners, the shift towards conscious consumption of digital content is reshaping how we interact with technology. This isn't just a trend; it's a fundamental rethinking of our relationship with the digital world.</p>
+                    <p>The question isn't whether you should join this movement, but how quickly you can start reducing the digital overwhelm that's been quietly stealing your focus, creativity, and peace of mind.</p>
+                </div>
+            </article>
+
+            <!-- Older Posts Section -->
+            <section class="collapsed-posts">
+                <h3 class="section-title">Previous Posts</h3>
+                
+                <div class="collapsed-post">
+                    <div class="collapsed-header" onclick="togglePost(this)">
+                        <div>
+                            <h4 class="collapsed-title">Why Gen Z is Abandoning Instagram</h4>
+                            <div class="collapsed-date">March 8, 2025</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsed-content">
+                        <div class="post-content">
+                            <p>The mass exodus from Instagram among Gen Z users isn't just about algorithm fatigue—it's a cultural shift towards authenticity and meaningful connections.</p>
+                            <p>New platforms are emerging that prioritize genuine interaction over performative content, and the implications for brands, influencers, and digital culture as a whole are massive.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsed-post">
+                    <div class="collapsed-header" onclick="togglePost(this)">
+                        <div>
+                            <h4 class="collapsed-title">The Vinyl Revival: More Than Just Nostalgia</h4>
+                            <div class="collapsed-date">February 28, 2025</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsed-content">
+                        <div class="post-content">
+                            <p>Vinyl sales are at their highest point since the 1980s, but this isn't just about retro aesthetics. Young people are craving tangible experiences in an increasingly digital world.</p>
+                            <p>The ritual of playing a record, the artwork, the intentional listening—it's all part of a larger movement towards mindful consumption and deeper engagement with art and culture.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapsed-post">
+                    <div class="collapsed-header" onclick="togglePost(this)">
+                        <div>
+                            <h4 class="collapsed-title">Fashion's New Rebel: Anti-Fast Fashion Culture</h4>
+                            <div class="collapsed-date">February 20, 2025</div>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="collapsed-content">
+                        <div class="post-content">
+                            <p>Thrift flips, clothing swaps, and 'no-buy' challenges are becoming the new status symbols among young consumers who are rejecting fast fashion's environmental and ethical costs.</p>
+                            <p>This cultural shift is forcing major brands to rethink their business models and embrace sustainability—not as a marketing tactic, but as a core value.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function togglePost(header) {
+            const post = header.parentElement;
+            const content = post.querySelector('.collapsed-content');
+            const icon = header.querySelector('.expand-icon');
+            
+            post.classList.toggle('expanded');
+            
+            if (post.classList.contains('expanded')) {
+                content.classList.add('expanded');
+            } else {
+                content.classList.remove('expanded');
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const posts = document.querySelectorAll('.collapsed-post');
+            
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            posts.forEach(post => {
+                post.style.opacity = '0';
+                post.style.transform = 'translateY(20px)';
+                post.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(post);
+            });
+        });
+
+        // Dynamic content loading simulation
+        // In a real implementation, this would fetch from your posts.json file
+        function loadLatestPost() {
+            // This function would typically fetch the latest post from your posts folder
+            // For now, it's just a placeholder for the structure
+            console.log('Loading latest post...');
+        }
+
+        // Call on page load
+        loadLatestPost();
+    </script>
+</body>
+</html>
