@@ -60,19 +60,35 @@
         }
 
         .post-card {
-            background: rgba(102, 126, 234, 0.1);
-            backdrop-filter: blur(20px);
+            background: transparent;
+            backdrop-filter: none;
             border-radius: 20px;
-            padding: 2.5rem;
+            padding: 0;
             margin-bottom: 2rem;
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
             transition: all 0.3s ease;
             border: 1px solid rgba(102, 126, 234, 0.15);
+            overflow: hidden;
         }
 
         .post-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+        }
+
+        .post-header {
+            background: rgba(102, 126, 234, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem 2.5rem 1.5rem 2.5rem;
+            margin: 0;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .post-body {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem 2.5rem 2.5rem 2.5rem;
+            margin: 0;
+            border-radius: 0 0 20px 20px;
         }
 
         .post-title {
@@ -226,6 +242,10 @@
             font-family: 'Assistant', 'Heebo', 'Alef', 'Segoe UI', Arial, sans-serif;
         }
 
+        .rtl .post-header {
+            text-align: right;
+        }
+
         .rtl .post-title {
             text-align: right;
         }
@@ -275,16 +295,20 @@
     <div class="container">
         <header class="header">
             <h1 class="logo">popculture</h1>
-            <p class="tagline">בלוג תרבות ישראלי</p>
+            <p class="tagline">מחשבות קטנות על תרבות גדולה</p>
         </header>
 
         <main>
             <!-- Latest Post -->
             <article class="post-card" id="latest-post">
-                <h2 class="post-title">Loading...</h2>
-                <div class="post-date">Please wait</div>
-                <div class="post-content">
-                    <p>Loading your latest post...</p>
+                <div class="post-header">
+                    <h2 class="post-title">Loading...</h2>
+                    <div class="post-date">Please wait</div>
+                </div>
+                <div class="post-body">
+                    <div class="post-content">
+                        <p>Loading your latest post...</p>
+                    </div>
                 </div>
             </article>
 
@@ -397,9 +421,13 @@
             const isHebrewContent = isPrimaryLanguageHebrew(post.title + ' ' + content);
             
             latestPostElement.innerHTML = `
-                <h2 class="post-title">${post.title}</h2>
-                <div class="post-date">${formatDate(post.date)}</div>
-                <div class="post-content">${content}</div>
+                <div class="post-header">
+                    <h2 class="post-title">${post.title}</h2>
+                    <div class="post-date">${formatDate(post.date)}</div>
+                </div>
+                <div class="post-body">
+                    <div class="post-content">${content}</div>
+                </div>
             `;
             
             // Apply RTL class if Hebrew content detected
