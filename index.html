@@ -216,6 +216,56 @@
                 box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
             }
         }
+
+        /* Hebrew RTL Support */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .rtl .post-title {
+            text-align: right;
+        }
+
+        .rtl .post-date {
+            text-align: right;
+        }
+
+        .rtl .post-content {
+            text-align: right;
+        }
+
+        .rtl .post-content p {
+            text-align: right;
+        }
+
+        .rtl .collapsed-header {
+            flex-direction: row-reverse;
+        }
+
+        .rtl .collapsed-title {
+            text-align: right;
+        }
+
+        .rtl .collapsed-date {
+            text-align: right;
+        }
+
+        .rtl .collapsed-content .post-content {
+            text-align: right;
+        }
+
+        .rtl .section-title {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .rtl .collapsed-header {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -228,66 +278,17 @@
         <main>
             <!-- Latest Post -->
             <article class="post-card pulse" id="latest-post">
-                <h2 class="post-title">The Rise of Digital Minimalism in 2025</h2>
-                <div class="post-date">March 15, 2025</div>
+                <h2 class="post-title">Loading...</h2>
+                <div class="post-date">Please wait</div>
                 <div class="post-content">
-                    <p>In a world saturated with digital noise, a new movement is quietly taking hold. Digital minimalism isn't just about decluttering your apps—it's about reclaiming your mental space and intentional living in the digital age.</p>
-                    <p>From celebrities posting less to viral TikToks about phone-free dinners, the shift towards conscious consumption of digital content is reshaping how we interact with technology. This isn't just a trend; it's a fundamental rethinking of our relationship with the digital world.</p>
-                    <p>The question isn't whether you should join this movement, but how quickly you can start reducing the digital overwhelm that's been quietly stealing your focus, creativity, and peace of mind.</p>
+                    <p>Loading your latest post...</p>
                 </div>
             </article>
 
             <!-- Older Posts Section -->
             <section class="collapsed-posts">
                 <h3 class="section-title">Previous Posts</h3>
-                
-                <div class="collapsed-post">
-                    <div class="collapsed-header" onclick="togglePost(this)">
-                        <div>
-                            <h4 class="collapsed-title">Why Gen Z is Abandoning Instagram</h4>
-                            <div class="collapsed-date">March 8, 2025</div>
-                        </div>
-                        <span class="expand-icon">▼</span>
-                    </div>
-                    <div class="collapsed-content">
-                        <div class="post-content">
-                            <p>The mass exodus from Instagram among Gen Z users isn't just about algorithm fatigue—it's a cultural shift towards authenticity and meaningful connections.</p>
-                            <p>New platforms are emerging that prioritize genuine interaction over performative content, and the implications for brands, influencers, and digital culture as a whole are massive.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="collapsed-post">
-                    <div class="collapsed-header" onclick="togglePost(this)">
-                        <div>
-                            <h4 class="collapsed-title">The Vinyl Revival: More Than Just Nostalgia</h4>
-                            <div class="collapsed-date">February 28, 2025</div>
-                        </div>
-                        <span class="expand-icon">▼</span>
-                    </div>
-                    <div class="collapsed-content">
-                        <div class="post-content">
-                            <p>Vinyl sales are at their highest point since the 1980s, but this isn't just about retro aesthetics. Young people are craving tangible experiences in an increasingly digital world.</p>
-                            <p>The ritual of playing a record, the artwork, the intentional listening—it's all part of a larger movement towards mindful consumption and deeper engagement with art and culture.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="collapsed-post">
-                    <div class="collapsed-header" onclick="togglePost(this)">
-                        <div>
-                            <h4 class="collapsed-title">Fashion's New Rebel: Anti-Fast Fashion Culture</h4>
-                            <div class="collapsed-date">February 20, 2025</div>
-                        </div>
-                        <span class="expand-icon">▼</span>
-                    </div>
-                    <div class="collapsed-content">
-                        <div class="post-content">
-                            <p>Thrift flips, clothing swaps, and 'no-buy' challenges are becoming the new status symbols among young consumers who are rejecting fast fashion's environmental and ethical costs.</p>
-                            <p>This cultural shift is forcing major brands to rethink their business models and embrace sustainability—not as a marketing tactic, but as a core value.</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Posts will be loaded dynamically from posts.json -->
             </section>
         </main>
     </div>
@@ -295,6 +296,24 @@
     <script>
         // Global variables
         let allPosts = [];
+
+        // Hebrew detection function
+        function isHebrew(text) {
+            // Hebrew Unicode range: \u0590-\u05FF
+            const hebrewRegex = /[\u0590-\u05FF]/;
+            return hebrewRegex.test(text);
+        }
+
+        // Detect if content is primarily Hebrew
+        function isPrimaryLanguageHebrew(content) {
+            // Remove HTML tags for text analysis
+            const textOnly = content.replace(/<[^>]*>/g, '');
+            const hebrewChars = (textOnly.match(/[\u0590-\u05FF]/g) || []).length;
+            const totalChars = textOnly.replace(/\s/g, '').length;
+            
+            // If more than 30% of characters are Hebrew, consider it Hebrew content
+            return totalChars > 0 && (hebrewChars / totalChars) > 0.3;
+        }
 
         function togglePost(header) {
             const post = header.parentElement;
@@ -371,11 +390,21 @@
             const latestPostElement = document.getElementById('latest-post');
             const content = await loadPostContent(post.filename);
             
+            // Check if content is Hebrew and apply RTL
+            const isHebrewContent = isPrimaryLanguageHebrew(post.title + ' ' + content);
+            
             latestPostElement.innerHTML = `
                 <h2 class="post-title">${post.title}</h2>
                 <div class="post-date">${formatDate(post.date)}</div>
                 <div class="post-content">${content}</div>
             `;
+            
+            // Apply RTL class if Hebrew content detected
+            if (isHebrewContent) {
+                latestPostElement.classList.add('rtl');
+            } else {
+                latestPostElement.classList.remove('rtl');
+            }
         }
 
         // Display older posts in collapsed format
@@ -393,8 +422,17 @@
             for (const post of posts) {
                 const content = await loadPostContent(post.filename);
                 
+                // Check if content is Hebrew
+                const isHebrewContent = isPrimaryLanguageHebrew(post.title + ' ' + content);
+                
                 const postElement = document.createElement('div');
                 postElement.className = 'collapsed-post';
+                
+                // Add RTL class if Hebrew content
+                if (isHebrewContent) {
+                    postElement.classList.add('rtl');
+                }
+                
                 postElement.innerHTML = `
                     <div class="collapsed-header" onclick="togglePost(this)">
                         <div>
